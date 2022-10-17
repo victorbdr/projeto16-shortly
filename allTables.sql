@@ -7,8 +7,8 @@ CREATE TABLE "users"(
 );
 CREATE TABLE "sessions"(
     "id" SERIAL PRIMARY KEY,
+    "userId"     INTEGER NOT NULL REFERENCES "users"("id"),
     "token" TEXT UNIQUE NOT NULL,
-    "userId" INTEGER NOT NULL REFERENCES "users"("id"),
    "createdAt" TIMESTAMP WITHOUT TIME ZONE NOT NULL DEFAULT NOW()
 );
 

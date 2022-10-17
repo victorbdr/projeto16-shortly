@@ -31,7 +31,7 @@ async function signIn(req, res) {
     ]);
     if(newSession.rows[0] && bcrypt.compareSync(password, newSession.rows[0].password )){
         const token = uuid()
-        await db.query(`INSERT INTO sessions ("userId",token) VALUES ($1,$2)`,[newSession.rows[0].id, token])
+        await db.query(`INSERT INTO sessions ("userId", token) VALUES ($1,$2)`,[newSession.rows[0].id, token])
        return res.send(token).status(200)
     }
   } catch (error) {
