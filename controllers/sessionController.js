@@ -7,8 +7,7 @@ async function sessionData(req, res) {
       `SELECT users.id, users.name, SUM(links."visitCount") AS "visitCount" FROM users
         LEFT JOIN links ON users.id = links."userId"
         WHERE users.id = $1
-        GROUP BY users.id`,
-      [id]
+        `[id]
     );
     console.log(session);
     if (!session.rows[0]) {
@@ -26,4 +25,18 @@ async function sessionData(req, res) {
   }
 }
 
-export { sessionData };
+async function usersRank(req, res) {
+  try {
+    const rank =
+      await db.query(`SELECT users.id, users.name, COUNT(links.url) as "linksCount", SUM(links."visitCount") AS "visitCount" FROM users 
+      LEFT JOIN links ON users.id = links."userId"
+      GROUP BY users.id
+      ORDER BY "visitCount" DESC LIMIT 10`);
+    res.send(rank.rows).status(200);
+  } catch (error) {
+    console.log(error);
+    res.sendStatus(500);
+  }
+}
+
+export { sessionData, usersRank };
