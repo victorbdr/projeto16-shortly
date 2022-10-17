@@ -26,15 +26,40 @@ async function getRequestedLink(req, res) {
       `SELECT id, "shortUrl", url FROM links WHERE "userId" = $1`,
       [id]
     );
-    const link = requestedLink.rows[0]
-    if(!link){
-        return res.sendStatus(404)
+    const link = requestedLink.rows[0];
+    if (!link) {
+      return res.sendStatus(404);
     }
-    res.send(link).status(200)
+    res.send(link).status(200);
   } catch (error) {
     console.log(error);
     res.sendStatus(500);
   }
 }
 
-export { linkShortener, getRequestedLink };
+async function urlRedirect(req, res) {
+  const { shortUrl } = req.params;
+  try {
+    const shortLink = await db.query(
+      `SELECT * FROM links WHERE "shortUrl" = $1`,
+      [shortUrl]
+    );
+
+    if (!shortLink.rows[0]) {
+      console.log(shortLink.rows[0]);
+      return res.sendStatus(404);
+    }
+
+    const countVisit = await db.query(
+      `UPDATE links SET "visitCount" = "visitCount" + 1 WHERE "shortUrl" = $1`,
+      [shortUrl]
+    );
+    const redirectlink = shortLink.rows[0].url;
+    res.redirect(redirectlink);
+  } catch (error) {
+    console.log(error);
+    res.sendStatus(500);
+  }
+}
+
+export { linkShortener, getRequestedLink, urlRedirect };
